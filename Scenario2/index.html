@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JavaScript Quiz</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f4f4; }
+  #box { max-width: 450px; margin: 40px auto; background: #fff; padding: 24px; border-radius: 8px; }
+  h2 { text-align: center; }
+  .info { font-size: 13px; color: #666; }
+  label { display: block; padding: 10px; margin: 8px 0; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; }
+  label:hover { background: #f0f0f0; }
+  button { padding: 8px 18px; border: none; border-radius: 4px; background: #333; color: #fff; cursor: pointer; }
+  button:disabled { background: #aaa; cursor: not-allowed; }
+  #result { text-align: center; }
+  #score { font-size: 40px; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div id="box">
+  <h2>JavaScript Quiz</h2>
+
+  <div id="quizArea">
+    <div class="info" id="qInfo"></div>
+    <h4 id="qText"></h4>
+    <div id="options"></div>
+    <button id="nextBtn" disabled>Next</button>
+  </div>
+
+  <div id="result" style="display:none;">
+    <div id="score"></div>
+    <p id="msg"></p>
+    <button id="restartBtn">Restart Quiz</button>
+  </div>
+</div>
+
+<script>
+  // Array of objects: question, options, index of correct answer
+  var questions = [
+    { question: "Which keyword declares a constant variable?",
+      options: ["var", "let", "const", "static"], answer: 2 },
+    { question: "Which method adds an element at the end of an array?",
+      options: ["pop()", "push()", "shift()", "splice()"], answer: 1 },
+    { question: "Which symbol is used for strict equality?",
+      options: ["=", "==", "===", "=>"], answer: 2 },
+    { question: "Which function is used to select an element by CSS selector?",
+      options: ["getElementById()", "querySelector()", "getName()", "selectNode()"], answer: 1 }
+  ];
+
+  var current = 0;
+  var score = 0;
+
+  var nextBtn = document.querySelector("#nextBtn");
+
+  function showQuestion() {
+    var q = questions[current];
+    document.querySelector("#qInfo").innerText = "Question " + (current + 1) + " of " + questions.length;
+    document.querySelector("#qText").innerText = q.question;
+
+    var html = "";
+    for (var i = 0; i < q.options.length; i++) {
+      html += "<label><input type='radio' name='opt' value='" + i + "'> " + q.options[i] + "</label>";
+    }
+    document.querySelector("#options").innerHTML = html;
+
+    nextBtn.disabled = true;                       // disabled until an option is selected
+    if (current === questions.length - 1) {
+      nextBtn.innerText = "Finish";
+    } else {
+      nextBtn.innerText = "Next";
+    }
+
+    var radios = document.querySelectorAll("input[name='opt']");
+    for (var j = 0; j < radios.length; j++) {
+      radios[j].onclick = function () { nextBtn.disabled = false; };
+    }
+  }
+
+  nextBtn.onclick = function () {
+    var selected = document.querySelector("input[name='opt']:checked");
+    if (selected && Number(selected.value) === questions[current].answer) {
+      score++;
+    }
+    current++;
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  };
+
+  function showResult() {
+    document.querySelector("#quizArea").style.display = "none";
+    document.querySelector("#result").style.display = "block";
+
+    var percent = (score / questions.length) * 100;
+    var message;
+    if (percent === 100) {
+      message = "Excellent work!";
+    } else if (percent >= 50) {
+      message = "Good job!";
+    } else {
+      message = "Keep practising!";
+    }
+
+    document.querySelector("#score").innerText = score + " / " + questions.length;
+    document.querySelector("#msg").innerText = "You scored " + percent + "%. " + message;
+  }
+
+  document.querySelector("#restartBtn").onclick = function () {
+    current = 0;
+    score = 0;
+    document.querySelector("#result").style.display = "none";
+    document.querySelector("#quizArea").style.display = "block";
+    showQuestion();
+  };
+
+  showQuestion();
+</script>
+</body>
+</html>
